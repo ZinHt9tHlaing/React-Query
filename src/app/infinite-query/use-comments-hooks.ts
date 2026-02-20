@@ -1,8 +1,12 @@
-import { fetchData } from "@/lib/fetch-utils";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { fetchData, postData } from "@/lib/fetch-utils";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { CommentsResponse } from "../api/comments/route";
 
-const UseCommentsQuery = () => {
+export const UseCommentsQuery = () => {
   return useInfiniteQuery({
     queryKey: ["comments"],
     queryFn: ({ pageParam }) =>
@@ -14,4 +18,14 @@ const UseCommentsQuery = () => {
   });
 };
 
-export default UseCommentsQuery;
+export const useCreateCommentMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (newComment: { text: string }) =>
+      postData(`/api/comments`, newComment),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+    },
+  });
+};
