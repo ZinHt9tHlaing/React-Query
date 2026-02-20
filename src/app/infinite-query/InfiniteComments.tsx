@@ -1,17 +1,33 @@
 import { formatRelativeDate } from "@/lib/utils";
 import { CommentForm } from "./CommentForm";
 import { Button } from "@/components/ui/button";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { fetchData } from "@/lib/fetch-utils";
+import { CommentsResponse } from "../api/comments/route";
+import UseCommentsQuery from "./use-comments-hooks";
 
 export default function InfiniteComments() {
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = UseCommentsQuery();
+
+  const comments = data?.pages.flatMap((page) => page.comments);
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">
-        Comments
+        Comments ({data?.pages[0].totalComments ?? "-"})
       </h2>
 
       <CommentForm />
 
-      {/* {isLoading && <p className="mb-4 text-blue-500">Loading comments...</p>}
+      {isLoading && <p className="mb-4 text-blue-500">Loading comments...</p>}
 
       {isError && (
         <div className="mb-4 text-red-500">
@@ -26,9 +42,9 @@ export default function InfiniteComments() {
       {comments && comments.length > 0 && (
         <div>
           <div className="space-y-3">
-            {comments?.map((comment) => (
+            {comments?.map((comment, index) => (
               <div
-                key={comment.id}
+                key={index}
                 className="flex gap-3 p-3 border rounded-lg bg-white"
               >
                 <div className="flex-shrink-0">
@@ -61,7 +77,7 @@ export default function InfiniteComments() {
             )}
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }
